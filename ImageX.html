@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>ImageX</title>
+	<link rel="icon" type="image/jpg" href="D:\IMP_Doc\imagex-low-resolution-logo-color-on-transparent-background.png">
+</head>
+<body>
+	<header>
+		<style>
+        ul{
+            list-style-type: none;
+            margin: 0;
+            padding: 12px;
+            overflow: hidden;
+            background-color:black;
+        }
+        li{
+            float:right;
+        }
+        li a{
+            display: block;
+            color: rgb(183, 64, 64);
+            text-align: center;
+            padding: 17px;
+            text-decoration: none;
+            font-size: 155%;
+        }
+        li a:hover {
+            background-color:black;
+        }</style>
+        <ul style="text-align:left;">
+            <img src="D:\IMP_Doc\imagex-low-resolution-logo-color-on-transparent-background.png" alt="ImageX" width="200" height="100">
+            <li><a href="#Menu">About</a></li>
+            <li><a href="#Menu">Services</a></li>
+            <li><a href="#Menu">Contact us </a></li>
+        </ul>
+	</header>
+	<main>
+		<section>
+			<h2>About Me</h2>
+			<p>Hi, my name is John and I'm a web developer. I enjoy creating websites and learning new technologies.</p>
+		</section>
+		<section>
+			<h2>Contact Me</h2>
+			<form>
+				<label for="name">Name:</label>
+				<input type="text" id="name" name="name" required>
+				<label for="email">Email:</label>
+				<input type="email" id="email" name="email" required>
+				<label for="message">Message:</label>
+				<textarea id="message" name="message" required></textarea>
+				<input type="submit" value="Send">
+			</form>
+		</section>
+	</main>
+	<footer>
+		<p>Copyright © My Website</p>
+	</footer>
+</body>
+</html>

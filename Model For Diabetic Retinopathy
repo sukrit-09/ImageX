@@ -1,0 +1,70 @@
+from re import X
+import torch 
+import torch.nn as nn
+import tensorflow as tf 
+import torch.nn.functional as F
+input_tensor = torch.randn(4,1,572,572)
+#kernel_tensor = tf.random.normal([3,3,1,64])
+
+class UNet(nn.Module):
+    def __init__(self):
+        super(UNet, self).__init__()
+        self.conv_layer_1 = nn.Conv2d(1,64,3,1,0)   
+        self.conv_layer_2 = nn.Conv2d(64,64,3,1,0)
+
+        self.conv_layer_3 = nn.Conv2d(64,128,3,1,0)
+        self.conv_layer_4 = nn.Conv2d(128,128,3,1,0)
+
+        self.conv_layer_5 = nn.Conv2d(128,256,3,1)  
+        self.conv_layer_6 = nn.Conv2d(256,256,3,1)
+
+        self.conv_layer_7 = nn.Conv2d(256,512,3,1)
+        self.conv_layer_8 = nn.Conv2d(512,512,3,1)
+
+        self.conv_layer_9 = nn.Conv2d(512,1024,3,1)
+        self.conv_layer_10 = nn.Conv2d(1024,1024,3,1)
+
+        self.upconv_layer_1 = nn.Conv2d()
+    
+    def forward(self, x):                               # 1x572x572
+        c1_out = F.relu(self.conv_layer_1(x))           # 64x570x570
+        c2_out = F.relu(self.conv_layer_2(c1_out))      # 64x568x568
+        print(c1_out.shape, c2_out.shape)
+       
+        m1 =  nn.MaxPool2d(2, stride=2)
+        p1_out = m1(c2_out)                             # 64x284x284
+        print(p1_out.shape)
+
+        c3_out = F.relu(self.conv_layer_3(p1_out))      # 128x282x282
+        c4_out = F.relu(self.conv_layer_4(c3_out))      # 128x280x280
+        print(c3_out.shape,c4_out.shape)
+
+        m2 =  nn.MaxPool2d(2, stride=2)
+        p2_out = m1(c4_out)                             # 128x140x140
+        print(p2_out.shape)
+
+        c5_out = F.relu(self.conv_layer_5(p2_out))      # 256x138x138
+        c6_out = F.relu(self.conv_layer_6(c5_out))      # 256x136x136
+        print(c5_out.shape,c6_out.shape)
+
+        m3 =  nn.MaxPool2d(2, stride=2)
+        p3_out = m1(c6_out)                             # 256x68x68
+        print(p3_out.shape)
+        
+        c7_out = F.relu(self.conv_layer_7(p3_out))      # 512x66x66
+        c8_out = F.relu(self.conv_layer_8(c7_out))      # 512x64x64
+        print(c7_out.shape,c8_out.shape)
+
+        m4 =  nn.MaxPool2d(2, stride=2)
+        p4_out = m1(c8_out)                             # 512x32x32
+        print(p4_out.shape)
+
+        c9_out = F.relu(self.conv_layer_9(p4_out))      # 1024x30x30
+        c10_out = F.relu(self.conv_layer_10(c9_out))    # 1024x28x28
+        print(c9_out.shape,c10_out.shape)
+
+        return (c10_out)
+    def upconv()         
+
+unet = UNet()
+print(unet(input_tensor).shape)

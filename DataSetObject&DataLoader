@@ -1,0 +1,120 @@
+import os
+import numpy as np
+from PIL import Image
+import torch 
+import cv2
+from torch.utils.data import Dataset
+from torch.utils.data import DataLoader
+import matplotlib.pyplot as plt
+
+
+
+
+folder_path = "C:/Users/dassu/Downloads/archive/A.%20Segmentation/A. Segmentation/1. Original Images/a. Training Set"
+
+# Get the list of files in the directory
+file_list = os.listdir(folder_path)
+
+array_list = []
+
+# Iterate over the files and convert the .jpg files to arrays
+for file_name in file_list:
+    file_path = os.path.join(folder_path, file_name)
+
+    # Check if the current item is a file and has .jpg extension
+    if os.path.isfile(file_path) and file_name.lower().endswith('.jpg'):
+        # Open the image file and convert it to a NumPy array
+        image = np.array(Image.open(file_path))
+
+        # Append the array to the list
+        array_list.append(image)
+
+# Convert the list of arrays to a single NumPy array
+array_data = np.array(array_list)
+
+# Convert the NumPy array to a PyTorch tensor
+input_tensor = torch.tensor(array_data)
+
+input_tensor = torch.tensor(input_tensor, dtype=torch.float32)
+
+
+folder_path = "C:/Users/dassu/Downloads/archive/A.%20Segmentation/A. Segmentation/2. All Segmentation Groundtruths/a. Training Set"
+subfolder_list = [subfolder for subfolder in os.listdir(folder_path) if os.path.isdir(os.path.join(folder_path, subfolder))]
+
+image_shape = (256, 256)
+num_subfolders = len(subfolder_list)
+image_arrays = []
+
+for subfolder_name in subfolder_list:
+    subfolder_path = os.path.join(folder_path, subfolder_name)
+
+    images_array = np.empty((image_shape[0], image_shape[1], 0))
+
+    for file_name in os.listdir(subfolder_path):
+        file_path = os.path.join(subfolder_path, file_name)
+
+        image = cv2.imread(file_path, cv2.IMREAD_GRAYSCALE)
+        image = cv2.resize(image, image_shape)
+
+        images_array = np.concatenate((images_array, image[:, :, np.newaxis]), axis=2)
+
+    image_arrays.append(images_array)
+
+# Combine the arrays into a single array
+combined_array = np.concatenate(image_arrays, axis=2)
+
+# Convert the NumPy array to a PyTorch tensor
+output_tensor = torch.from_numpy(combined_array)
+
+
+output_tensor = torch.tensor(combined_array)
+
+output_tensor = torch.tensor(output_tensor, dtype=torch.float32)
+
+# Rearrange dimensions if necessary
+#output_tensor = output_tensor.permute(2, 0, 1)
+
+
+class CustomDataset(Dataset):
+    def __init__(self, input_tensor, output_tensor):
+        self.input_tensor = input_tensor
+        self.output_tensor = output_tensor
+
+    def __len__(self):
+        return len(self.input_tensor)
+
+    def __getitem__(self, index):
+        input_data = self.input_tensor[index]
+        output_data = self.output_tensor[index]
+        return input_data, output_data
+
+# Create an instance of your custom dataset
+custom_dataset = CustomDataset(input_tensor, output_tensor)
+
+# Accessing the data in the custom dataset
+input_data, output_data = custom_dataset[0]
+
+#Preparing your data for training with DataLoaders
+
+train_dataloader = DataLoader(custom_dataset, batch_size=64, shuffle=True)
+
+# Display image and label.
+# Get the next batch of training data
+input_tensor, output_tensor = next(iter(train_dataloader))
+
+# Print the shape of the feature and label batches
+print(f"Feature batch shape: {input_tensor.size()}")
+print(f"Labels batch shape: {output_tensor.size()}")
+
+# Get the first image and label from the batches
+img = input_tensor[0].permute(0, 1, 2).numpy()
+label = output_tensor[0]
+
+# Display the image
+plt.imshow(img)
+plt.axis('off')
+plt.show()
+
+# Print the label
+print(f"Label: {label}")
+
